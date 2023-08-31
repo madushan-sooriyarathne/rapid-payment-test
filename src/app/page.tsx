@@ -72,19 +72,20 @@ export default function Homepage() {
       .catch((err) => console.error(err));
   };
 
-
   return (
-    <div className="mx-auto my-auto h-[600px] w-[min(100%,1000px)] rounded-lg shadow-lg shadow-black/10">
-      <h1 className="text-center text-5xl font-bold tracking-tight text-orange-400">
-        Rapid Adventures x WebXPay integration
-      </h1>
-      <button
-        type="button"
-        onClick={handleSubmit}
-        className="rounded-lg border-white px-4 py-4"
-      >
-        Submit
-      </button>
+    <div className="mx-auto my-auto grid h-[600px] w-[min(100%,1000px)] place-content-center rounded-lg bg-slate-50 p-12 shadow-lg shadow-black/10">
+      <div className="flex flex-col items-center justify-center gap-y-9">
+        <h1 className="text-center text-5xl font-bold tracking-tight text-orange-400">
+          Rapid Adventures x WebXPay integration
+        </h1>
+        <button
+          type="button"
+          onClick={handleSubmit}
+          className="rounded-lg border-slate-800 bg-slate-800 px-4 py-2 text-sm font-semibold uppercase tracking-wider text-white"
+        >
+          Checkout
+        </button>
+      </div>
     </div>
   );
 }

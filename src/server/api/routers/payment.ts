@@ -4,6 +4,23 @@ import { env } from "@env";
 import { createTRPCRouter, publicProcedure } from "@server/api/trpc";
 
 export const paymentRouter = createTRPCRouter({
+  /**
+   * Generate Payment Parameters
+   * This trpc route handler generates public key encrypted payment parameter for a given orderId and Amount.
+   * This function takes two input parameters, orderId and orderAmount, and generates payment parameters
+   * by encrypting them with a public key. It returns an object with the status of the operation
+   * (success or failed), a message, and the encrypted payment parameters as data.
+   *
+   * @param {Object} input - Input parameters for generating payment parameters.
+   * @param {string} input.orderId - The ID of the order (must be more than 1 character).
+   * @param {number} input.orderAmount - The order amount.
+   *
+   * @returns {Object} - An object containing payment parameters.
+   * @returns {string} Object.status - The status of the payment (success or failed).
+   * @returns {string} Object.message - A message regarding the payment.
+   * @returns {Object|null} Object.data - Additional data, including payment parameters.
+   * @returns {string|null} Object.data.params - The payment parameters as a string (nullable).
+   */
   genereatePaymentParams: publicProcedure
     .input(
       z.object({
