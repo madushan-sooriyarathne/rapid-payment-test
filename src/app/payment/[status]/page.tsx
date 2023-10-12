@@ -16,7 +16,7 @@ export default function PaymentConfirmationPage({
             Transation successful!
           </h1>
           <p className="text-center text-lg text-black">{`Order Id: ${searchParams.get(
-            "orderId"
+            "order_id"
           )}`}</p>
         </div>
       ) : (

@@ -1,36 +1,62 @@
 import { env } from "@env";
-import { createVerify } from "crypto";
+import NodeRSA from "node-rsa";
 import { redirect } from "next/navigation";
 
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
 
-    const signature = formData.get("signature");
-    const paymentResponse = formData.get("payment");
+    // capture incoming data
+    const signatureData = formData.get("signature");
+    const paymentResponseData = formData.get("payment");
 
-    if (!signature || !paymentResponse) {
+    if (!signatureData || !paymentResponseData) {
       const siteUrl = new URL("/payment/failed", env.NEXT_PUBLIC_SITE_URL);
       siteUrl.searchParams.set("reason", "invalid response");
       redirect(siteUrl.href);
     }
 
-    // decode & parse the public key (which is base64 encoded and stored as an env variable)
-    const publicKey = Buffer.from(
-      env.PAYMENT_GATEWAY_PUBLIC_KEY,
+    // base64 decode them and convert to a Buffer
+    const payment = Buffer.from(
+      paymentResponseData.toString(),
       "base64"
     ).toString("utf-8");
+    const signature = signatureData.toString();
 
-    const verifer = createVerify("RSA-SHA256");
-    verifer.update(paymentResponse.toString());
-    const verified = verifer.verify(publicKey, signature.toString());
+    // decode & parse the public key (which is base64 encoded and stored as an env variable)
+    const publicKey = Buffer.from(env.PAYMENT_GATEWAY_PUBLIC_KEY, "base64")
+      .toString("utf-8")
+      .replaceAll(/(\r\n|\n|\r)/gm, "");
+
+    console.log({
+      signature,
+      payment,
+      publicKey,
+    });
+
+    // initialize the public key
+    const publickey = new NodeRSA(publicKey, "pkcs8-public");
+
+    // is data verified
+    const verified = publickey.verify(
+      Buffer.from(payment.toString(), "utf-8"),
+      signature.toString(),
+      "utf8",
+      "base64"
+    );
+    console.log({ verified });
 
     if (verified) {
       // redirect to success page with the order number
       // decode the payment Response
-      const paymentData = Buffer.from(paymentResponse as string, "base64")
-        .toString("utf-8")
-        .split("|") as [string, string, string, string, string, string];
+      const paymentData = payment.split("|") as [
+        string,
+        string,
+        string,
+        string,
+        string,
+        string
+      ];
 
       if (paymentData[3] && paymentData[3] === "0") {
         // transaction approved
